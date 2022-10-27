@@ -23,12 +23,15 @@ class CreationParams {
         AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
     this.backgroundColor,
     this.cookies = const <WebViewCookie>[],
+    this.accText,
   }) : assert(autoMediaPlaybackPolicy != null);
 
   /// The initialUrl to load in the webview.
   ///
   /// When null the webview will be created without loading any page.
   final String? initialUrl;
+
+  final String? accText;
 
   /// The initial [WebSettings] for the new webview.
   ///
