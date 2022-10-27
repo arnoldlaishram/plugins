@@ -349,6 +349,12 @@ public class WebViewHostApiImpl implements WebViewHostApi {
   }
 
   @Override
+  public void setAccText(Long instanceId, String accText) {
+    final WebView webView = (WebView) instanceManager.getInstance(instanceId);
+    webView.setContentDescription(accText);
+  }
+
+  @Override
   public void loadData(Long instanceId, String data, String mimeType, String encoding) {
     final WebView webView = (WebView) instanceManager.getInstance(instanceId);
     webView.loadData(data, mimeType, encoding);

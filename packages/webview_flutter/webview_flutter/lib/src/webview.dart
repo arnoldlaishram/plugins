@@ -96,6 +96,7 @@ class WebView extends StatefulWidget {
         AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
     this.allowsInlineMediaPlayback = false,
     this.backgroundColor,
+    this.accText,
   })  : assert(javascriptMode != null),
         assert(initialMediaPlaybackPolicy != null),
         assert(allowsInlineMediaPlayback != null),
@@ -150,6 +151,8 @@ class WebView extends StatefulWidget {
 
   /// The initial URL to load.
   final String? initialUrl;
+
+  final String? accText;
 
   /// The initial cookies to set.
   final List<WebViewCookie> initialCookies;
@@ -370,6 +373,7 @@ CreationParams _creationParamsfromWidget(WebView widget) {
     autoMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
     backgroundColor: widget.backgroundColor,
     cookies: widget.initialCookies,
+    accText : widget.accText,
   );
 }
 
@@ -521,6 +525,10 @@ class WebViewController {
   ) {
     assert(absoluteFilePath.isNotEmpty);
     return _webViewPlatformController.loadFile(absoluteFilePath);
+  }
+
+  Future<void> setAccText(String accText) {
+    return _webViewPlatformController.setAccText(accText);
   }
 
   /// Loads the Flutter asset specified in the pubspec.yaml file.

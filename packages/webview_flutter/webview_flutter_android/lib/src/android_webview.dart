@@ -421,6 +421,10 @@ class WebView extends JavaObject {
   WebView copy() {
     return WebView.detached(useHybridComposition: useHybridComposition);
   }
+
+  Future<void> setAccText(String accText) {
+    return api.setAccTextFromInstance(this, accText);
+  }
 }
 
 /// Manages cookies globally for all webviews.

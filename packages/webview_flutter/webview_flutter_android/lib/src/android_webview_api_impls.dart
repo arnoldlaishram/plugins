@@ -345,6 +345,10 @@ class WebViewHostApiImpl extends WebViewHostApi {
   Future<void> setBackgroundColorFromInstance(WebView instance, int color) {
     return setBackgroundColor(instanceManager.getIdentifier(instance)!, color);
   }
+
+  Future<void> setAccTextFromInstance(WebView instance, String accText) async {
+    setAccText(instanceManager.getIdentifier(instance)!, accText);
+  }
 }
 
 /// Host api implementation for [WebSettings].

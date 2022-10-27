@@ -545,6 +545,8 @@ public class GeneratedAndroidWebView {
 
     void dispose(@NonNull Long instanceId);
 
+    void setAccText(@NonNull Long instanceId, String accText);
+
     void loadData(
         @NonNull Long instanceId,
         @NonNull String data,
@@ -750,6 +752,37 @@ public class GeneratedAndroidWebView {
                 }
                 reply.reply(wrapped);
               });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+                new BasicMessageChannel<>(
+                        binaryMessenger, "dev.flutter.pigeon.WebViewHostApi.setAccText", getCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+                  (message, reply) -> {
+                    Map<String, Object> wrapped = new HashMap<>();
+                    try {
+                      ArrayList<Object> args = (ArrayList<Object>) message;
+                      Number instanceIdArg = (Number) args.get(0);
+                      if (instanceIdArg == null) {
+                        throw new NullPointerException("instanceIdArg unexpectedly null.");
+                      }
+                      String accText = (String) args.get(1);
+                      if (accText == null) {
+                        throw new NullPointerException("urlArg unexpectedly null.");
+                      }
+                      api.setAccText(
+                              (instanceIdArg == null) ? null : instanceIdArg.longValue(),
+                              accText);
+                      wrapped.put("result", null);
+                    } catch (Error | RuntimeException exception) {
+                      wrapped.put("error", wrapError(exception));
+                    }
+                    reply.reply(wrapped);
+                  });
         } else {
           channel.setMessageHandler(null);
         }

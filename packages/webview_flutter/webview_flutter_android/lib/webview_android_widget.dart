@@ -132,6 +132,10 @@ class WebViewAndroidPlatformController extends WebViewPlatformController {
     if (initialUrl != null) {
       loadUrl(initialUrl, <String, String>{});
     }
+    final String? accText = creationParams.accText;
+    if(accText != null) {
+      setAccText(accText);
+    }
   }
 
   final Map<String, WebViewAndroidJavaScriptChannel> _javaScriptChannels =
@@ -222,6 +226,11 @@ class WebViewAndroidPlatformController extends WebViewPlatformController {
     Map<String, String>? headers,
   ) {
     return webView.loadUrl(url, headers ?? <String, String>{});
+  }
+
+  @override
+  Future<void> setAccText(String accText) {
+    return webView.setAccText(accText);
   }
 
   /// When making a POST request, headers are ignored. As a workaround, make
