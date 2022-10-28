@@ -540,6 +540,9 @@ abstract class WKWebViewHostApi {
   @ObjCSelector('loadRequestForWebViewWithIdentifier:request:')
   void loadRequest(int identifier, NSUrlRequestData request);
 
+  @ObjCSelector('setAccTextForWebViewWithIdentifier:accText:')
+  void setAccText(int identifier, String accText);
+
   @ObjCSelector('loadHTMLForWebViewWithIdentifier:HTMLString:baseURL:')
   void loadHtmlString(int identifier, String string, String? baseUrl);
 

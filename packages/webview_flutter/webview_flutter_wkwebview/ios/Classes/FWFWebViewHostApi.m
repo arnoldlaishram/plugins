@@ -136,6 +136,13 @@
   [[self webViewForIdentifier:identifier] loadRequest:urlRequest];
 }
 
+- (void)setAccTextForWebViewWithIdentifier:(nonnull NSNumber *)identifier 
+                                    accText: (nonnull NSString *) accText
+                                      error:
+                                          (FlutterError *_Nullable __autoreleasing *_Nonnull)error {  
+  [[self webViewForIdentifier:identifier] setAccessibilityLabel:accText];
+}
+
 - (void)setUserAgentForWebViewWithIdentifier:(nonnull NSNumber *)identifier
                                    userAgent:(nullable NSString *)userAgent
                                        error:(FlutterError *_Nullable __autoreleasing *_Nonnull)

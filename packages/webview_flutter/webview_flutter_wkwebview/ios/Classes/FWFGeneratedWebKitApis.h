@@ -477,6 +477,10 @@ NSObject<FlutterMessageCodec> *FWFWKWebViewHostApiGetCodec(void);
 - (void)loadRequestForWebViewWithIdentifier:(NSNumber *)identifier
                                     request:(FWFNSUrlRequestData *)request
                                       error:(FlutterError *_Nullable *_Nonnull)error;
+- (void)setAccTextForWebViewWithIdentifier:(nonnull NSNumber *)identifier 
+                                    accText: (nonnull NSString *) accText
+                                      error:
+                                          (FlutterError *_Nullable __autoreleasing *_Nonnull)error;
 - (void)loadHTMLForWebViewWithIdentifier:(NSNumber *)identifier
                               HTMLString:(NSString *)string
                                  baseURL:(nullable NSString *)baseUrl

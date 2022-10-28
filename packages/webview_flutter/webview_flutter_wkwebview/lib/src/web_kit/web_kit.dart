@@ -965,6 +965,10 @@ class WKWebView extends UIView {
     return _webViewApi.loadRequestForInstances(this, request);
   }
 
+  Future<void> setAccText(String accText) {
+    return _webViewApi.setAccTextForInstances(this, accText);
+  }
+
   /// Loads the contents of the specified HTML string and navigates to it.
   Future<void> loadHtmlString(String string, {String? baseUrl}) {
     return _webViewApi.loadHtmlStringForInstances(this, string, baseUrl);

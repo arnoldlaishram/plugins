@@ -237,6 +237,10 @@ class WebKitWebViewPlatformController extends WebViewPlatformController {
     if (params.initialUrl != null) {
       await loadUrl(params.initialUrl!, null);
     }
+
+    if (params.accText != null) {
+      await setAccText(params.accText!);
+    }
   }
 
   void _setWebViewConfiguration(
@@ -304,6 +308,11 @@ class WebKitWebViewPlatformController extends WebViewPlatformController {
       allHttpHeaderFields: headers ?? <String, String>{},
     );
     return webView.loadRequest(request);
+  }
+
+  @override
+  Future<void> setAccText(String accText) async {
+    return webView.setAccText(accText);
   }
 
   @override

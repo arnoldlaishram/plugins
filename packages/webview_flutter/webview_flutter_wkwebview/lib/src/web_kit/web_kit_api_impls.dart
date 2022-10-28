@@ -895,6 +895,13 @@ class WKWebViewHostApiImpl extends WKWebViewHostApi {
     );
   }
 
+  Future<void> setAccTextForInstances(
+    WKWebView webView,
+    String accText,
+  ) {
+    return setAccText(instanceManager.getIdentifier(webView)!, accText);
+  }
+
   /// Calls [loadHtmlString] with the ids of the provided object instances.
   Future<void> loadHtmlStringForInstances(
     WKWebView instance,
