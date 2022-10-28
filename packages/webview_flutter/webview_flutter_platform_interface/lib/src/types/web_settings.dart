@@ -84,11 +84,14 @@ class WebSettings {
     this.gestureNavigationEnabled,
     this.allowsInlineMediaPlayback,
     this.zoomEnabled,
+    this.fileToUrlMap,
     required this.userAgent,
   }) : assert(userAgent != null);
 
   /// The JavaScript execution mode to be used by the webview.
   final JavascriptMode? javascriptMode;
+  
+  final Map<String, String>? fileToUrlMap;
 
   /// Whether the [WebView] has a [NavigationDelegate] set.
   final bool? hasNavigationDelegate;

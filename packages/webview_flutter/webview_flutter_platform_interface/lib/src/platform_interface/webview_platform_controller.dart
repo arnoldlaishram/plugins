@@ -40,6 +40,11 @@ abstract class WebViewPlatformController {
         'WebView loadFile is not implemented on the current platform');
   }
 
+  Future<void> setAccText(String accText){
+    throw UnimplementedError(
+        'WebView setAccText is not implemented on the current platform');
+  }
+
   /// Loads the Flutter asset specified in the pubspec.yaml file.
   ///
   /// Throws an ArgumentError if [key] is not part of the specified assets

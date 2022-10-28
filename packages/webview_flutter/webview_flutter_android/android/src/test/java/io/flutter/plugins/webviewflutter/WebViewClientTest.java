@@ -20,6 +20,7 @@ import android.webkit.WebViewClient;
 import io.flutter.plugins.webviewflutter.WebViewClientHostApiImpl.WebViewClientCompatImpl;
 import io.flutter.plugins.webviewflutter.WebViewClientHostApiImpl.WebViewClientCreator;
 import java.util.HashMap;
+import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,10 +50,10 @@ public class WebViewClientTest {
         new WebViewClientCreator() {
           @Override
           public WebViewClient createWebViewClient(
-              WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading) {
+              WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,  Map<String, String> fileToUrlMap) {
             webViewClient =
                 (WebViewClientCompatImpl)
-                    super.createWebViewClient(flutterApi, shouldOverrideUrlLoading);
+                    super.createWebViewClient(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
             return webViewClient;
           }
         };

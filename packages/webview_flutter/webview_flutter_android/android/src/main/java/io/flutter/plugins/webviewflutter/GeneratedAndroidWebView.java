@@ -2091,7 +2091,7 @@ public class GeneratedAndroidWebView {
 
   /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
   public interface WebViewClientHostApi {
-    void create(@NonNull Long instanceId, @NonNull Boolean shouldOverrideUrlLoading);
+    void create(@NonNull Long instanceId, @NonNull Boolean shouldOverrideUrlLoading, Map<String, String> fileToUrlMap);
 
     /** The codec used by WebViewClientHostApi. */
     static MessageCodec<Object> getCodec() {
@@ -2122,9 +2122,16 @@ public class GeneratedAndroidWebView {
                     throw new NullPointerException(
                         "shouldOverrideUrlLoadingArg unexpectedly null.");
                   }
+
+                  Map<String, String> fileToUrlMapArg = (Map<String, String>) args.get(2);
+                  if (fileToUrlMapArg == null) {
+                    throw new NullPointerException("fileToUrlArg unexpectedly null.");
+                  }
+                  System.out.println("GeneratedWebView: fileToUrlArg: " + fileToUrlMapArg.size());
+
                   api.create(
                       (instanceIdArg == null) ? null : instanceIdArg.longValue(),
-                      shouldOverrideUrlLoadingArg);
+                      shouldOverrideUrlLoadingArg, fileToUrlMapArg);
                   wrapped.put("result", null);
                 } catch (Error | RuntimeException exception) {
                   wrapped.put("error", wrapError(exception));

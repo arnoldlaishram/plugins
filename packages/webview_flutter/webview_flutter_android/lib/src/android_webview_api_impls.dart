@@ -565,10 +565,10 @@ class WebViewClientHostApiImpl extends WebViewClientHostApi {
   final InstanceManager instanceManager;
 
   /// Helper method to convert instances ids to objects.
-  Future<void> createFromInstance(WebViewClient instance) async {
+  Future<void> createFromInstance(WebViewClient instance, Map<String, String>? fileToUrlMap) async {
     if (instanceManager.getIdentifier(instance) == null) {
       final int identifier = instanceManager.addDartCreatedInstance(instance);
-      return create(identifier, instance.shouldOverrideUrlLoading);
+      return create(identifier, instance.shouldOverrideUrlLoading, fileToUrlMap);
     }
   }
 }

@@ -135,6 +135,16 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   }
 
   @override
+  Future<void> setAccText(
+      String accText,
+      ) async {
+    assert(accText != null);
+    return _channel.invokeMethod<void>('setAccText', <String, dynamic>{
+      'accText': accText
+    });
+  }
+
+  @override
   Future<void> loadRequest(WebViewRequest request) async {
     assert(request != null);
     return _channel.invokeMethod<void>('loadRequest', <String, dynamic>{

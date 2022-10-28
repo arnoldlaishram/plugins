@@ -286,7 +286,7 @@ class WebViewAndroidPlatformController extends WebViewPlatformController {
       if (setting.hasProgressTracking != null)
         _setHasProgressTracking(setting.hasProgressTracking!),
       if (setting.hasNavigationDelegate != null)
-        _setHasNavigationDelegate(setting.hasNavigationDelegate!),
+        _setHasNavigationDelegate(setting.hasNavigationDelegate!, setting.fileToUrlMap),
       if (setting.javascriptMode != null)
         _setJavaScriptMode(setting.javascriptMode!),
       if (setting.debuggingEnabled != null)
@@ -406,7 +406,7 @@ class WebViewAndroidPlatformController extends WebViewPlatformController {
     }
   }
 
-  Future<void> _setHasNavigationDelegate(bool hasNavigationDelegate) {
+  Future<void> _setHasNavigationDelegate(bool hasNavigationDelegate, Map<String, String>? fileToUrlMap) {
     if (hasNavigationDelegate) {
       downloadListener._onNavigationRequest =
           callbacksHandler.onNavigationRequest;
@@ -425,7 +425,7 @@ class WebViewAndroidPlatformController extends WebViewPlatformController {
         onWebResourceErrorCallback: callbacksHandler.onWebResourceError,
       );
     }
-    return webView.setWebViewClient(_webViewClient);
+    return webView.setWebViewClient(_webViewClient, fileToUrlMap);
   }
 
   Future<void> _setJavaScriptMode(JavascriptMode mode) {

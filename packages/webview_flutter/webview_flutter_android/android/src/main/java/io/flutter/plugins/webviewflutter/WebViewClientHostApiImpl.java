@@ -8,9 +8,11 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
@@ -18,6 +20,20 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.webkit.WebResourceErrorCompat;
 import androidx.webkit.WebViewClientCompat;
+
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Host api implementation for {@link WebViewClient}.
@@ -39,6 +55,45 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
   public static class WebViewClientImpl extends WebViewClient implements ReleasableWebViewClient {
     @Nullable private WebViewClientFlutterApiImpl flutterApi;
     private final boolean shouldOverrideUrlLoading;
+    private final Map<String, String> fileToUrlMap;
+
+    @Nullable
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+      System.out.println("WebViewClientImpl: shouldInterceptRequest()");
+      String requestUrl = null;
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        requestUrl = request.getUrl().toString();
+      }
+
+      System.out.println("WebViewClientImpl intercepting url : " + requestUrl);
+      System.out.println("WebViewClientImpl fileToUrlMap : " + new JSONObject(fileToUrlMap));
+      if (!fileToUrlMap.containsKey(requestUrl))
+        return super.shouldInterceptRequest(view, request);
+
+      String fileExt = getFileExtFromUrl(requestUrl);
+      String mimeType = getMimeTypeMap().get(fileExt);
+      String encoding = getEncoding(fileExt);
+      String filePath = fileToUrlMap.get(requestUrl);
+      System.out.println("WebViewClientImpl filePath : " + filePath);
+      WebResourceResponse webResponseFromFile = getWebResponseFromFile(fileExt, filePath, mimeType, encoding);
+      if (webResponseFromFile != null) {
+        System.out.println("WebViewClientImpl intercepting url success : " + filePath);
+        // Whenever, font file .woff is loaded from cache No Access-Control-Allow-Origin
+        // header added error occurs. This is  an error specific to woff files.
+        // To solve this issue, add Access-Control-Allow-Origin header when returning the WebResourceResponse.
+        Map<String, String> responseHeaders = webResponseFromFile.getResponseHeaders();
+        Map<String, String> resHeaders = responseHeaders == null ? new HashMap<>() : responseHeaders;
+        resHeaders.put("Access-Control-Allow-Origin", "*");
+        webResponseFromFile.setResponseHeaders(resHeaders);
+        return webResponseFromFile;
+      }
+
+      if ("text/html".equals(mimeType)) {
+        return getHtmlMimeTypeWebResourceResponse(requestUrl, mimeType);
+      }
+      return super.shouldInterceptRequest(view, request);
+    }
 
     /**
      * Creates a {@link WebViewClient} that passes arguments of callbacks methods to Dart.
@@ -47,9 +102,10 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
      * @param shouldOverrideUrlLoading whether loading a url should be overridden
      */
     public WebViewClientImpl(
-        @NonNull WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading) {
+        @NonNull WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading, Map<String, String> fileToUrlMap) {
       this.shouldOverrideUrlLoading = shouldOverrideUrlLoading;
       this.flutterApi = flutterApi;
+      this.fileToUrlMap = fileToUrlMap;
     }
 
     @Override
@@ -121,11 +177,48 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
       implements ReleasableWebViewClient {
     private @Nullable WebViewClientFlutterApiImpl flutterApi;
     private final boolean shouldOverrideUrlLoading;
+    private final Map<String, String> fileToUrlMap;
 
     public WebViewClientCompatImpl(
-        @NonNull WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading) {
+        @NonNull WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,
+        Map<String, String> fileToUrlMap) {
       this.shouldOverrideUrlLoading = shouldOverrideUrlLoading;
       this.flutterApi = flutterApi;
+      this.fileToUrlMap = fileToUrlMap;
+    }
+
+    @Nullable
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+      String requestUrl = null;
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        requestUrl = request.getUrl().toString();
+      }
+      if (!fileToUrlMap.containsKey(requestUrl))
+        return super.shouldInterceptRequest(view, request);
+
+      Log.d("WebViewHostImpl", "intercepting url : " + requestUrl);
+      String fileExt = getFileExtFromUrl(requestUrl);
+      String mimeType = getMimeTypeMap().get(fileExt);
+      String encoding = getEncoding(fileExt);
+      String filePath = fileToUrlMap.get(requestUrl);
+      WebResourceResponse webResponseFromFile = getWebResponseFromFile(fileExt, filePath, mimeType, encoding);
+      if (webResponseFromFile != null) {
+        Log.d("WebViewHostImpl", " : intercepting url success : " + filePath);
+        // Whenever, font file .woff is loaded from cache No Access-Control-Allow-Origin
+        // header added error occurs. This is  an error specific to woff files.
+        // To solve this issue, add Access-Control-Allow-Origin header when returning the WebResourceResponse.
+        Map<String, String> responseHeaders = webResponseFromFile.getResponseHeaders();
+        Map<String, String> resHeaders = responseHeaders == null ? new HashMap<>() : responseHeaders;
+        resHeaders.put("Access-Control-Allow-Origin", "*");
+        webResponseFromFile.setResponseHeaders(resHeaders);
+        return webResponseFromFile;
+      }
+
+      if ("text/html".equals(mimeType)) {
+        return getHtmlMimeTypeWebResourceResponse(requestUrl, mimeType);
+      }
+      return super.shouldInterceptRequest(view, request);
     }
 
     @Override
@@ -207,7 +300,7 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
      * @return the created {@link WebViewClient}
      */
     public WebViewClient createWebViewClient(
-        WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading) {
+        WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,  Map<String, String> fileToUrlMap) {
       // WebViewClientCompat is used to get
       // shouldOverrideUrlLoading(WebView view, WebResourceRequest request)
       // invoked by the webview on older Android devices, without it pages that use iframes will
@@ -217,9 +310,9 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
       // to bug https://bugs.chromium.org/p/chromium/issues/detail?id=925887. Also, see
       // https://github.com/flutter/flutter/issues/29446.
       if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        return new WebViewClientImpl(flutterApi, shouldOverrideUrlLoading);
+        return new WebViewClientImpl(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
       } else {
-        return new WebViewClientCompatImpl(flutterApi, shouldOverrideUrlLoading);
+        return new WebViewClientCompatImpl(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
       }
     }
   }
@@ -241,9 +334,74 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
   }
 
   @Override
-  public void create(Long instanceId, Boolean shouldOverrideUrlLoading) {
+  public void create(Long instanceId, Boolean shouldOverrideUrlLoading,  Map<String, String> fileToUrlMap) {
     final WebViewClient webViewClient =
-        webViewClientCreator.createWebViewClient(flutterApi, shouldOverrideUrlLoading);
+        webViewClientCreator.createWebViewClient(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
     instanceManager.addDartCreatedInstance(webViewClient, instanceId);
+  }
+
+  private static WebResourceResponse getHtmlMimeTypeWebResourceResponse(String requestUrl, String mimeType) {
+    HttpURLConnection urlConnection = null;
+    try {
+      URL url = new URL(requestUrl);
+      urlConnection = (HttpURLConnection) url.openConnection();
+      String contentDisposition = urlConnection.getHeaderField("content-disposition");
+      if (contentDisposition == null || !contentDisposition.contains("attachment"))
+        return null;
+      InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+      return new WebResourceResponse(mimeType, "UTF-8", in);
+    } catch (MalformedURLException e) {
+      Log.d("WebViewHostImpl", "MalformedURLException : " + e.getMessage());
+    } catch (IOException e) {
+      Log.d("WebViewHostImpl", "IOException : " + e.getMessage());
+    } finally {
+      if (urlConnection != null) urlConnection.disconnect();
+    }
+    return null;
+  }
+
+  private static WebResourceResponse getWebResponseFromFile(String fileExt, String filePath, String mimeType, String encoding) {
+    if (filePath == null || filePath.isEmpty()) return null;
+    File file = new File(filePath);
+    if (!file.exists()) return null;
+    try {
+      FileInputStream fileInputStream = new FileInputStream(file);
+      if ("gz".equals(fileExt)) {
+        GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
+        return new WebResourceResponse(mimeType, encoding, gzipInputStream);
+      }
+      return new WebResourceResponse(mimeType, encoding, fileInputStream);
+    } catch (IOException e) {
+      return null;
+    }
+  }
+
+  public static Map<String, String> getMimeTypeMap() {
+    Map<String, String> map = new HashMap<>();
+    map.put("html", "text/html");
+    map.put("gz", "text/html");
+    map.put("css", "text/css");
+    map.put("js", "text/javascript");
+    map.put("png", "image/png");
+    map.put("jpg", "image/jpeg");
+    map.put("ico", "image/x-icon");
+    map.put("svg", "image/svg+xml");
+    map.put("webp", "image/webp");
+    map.put("woff", "application/x-font-opentype");
+    map.put("ttf", "application/x-font-opentype");
+    map.put("eot", "application/x-font-opentype");
+    return map;
+  }
+
+  public static String getEncoding(String fileExtension) {
+    if ("gz".equals(fileExtension)) return "gzip";
+    else return "UTF-8";
+  }
+
+  public static String getFileExtFromUrl(String url) {
+    if (url == null || url.isEmpty()) return null;
+    int lastIndexOfDot = url.lastIndexOf(".");
+    int urlLength = url.length();
+    return url.substring(lastIndexOfDot + 1, urlLength);
   }
 }

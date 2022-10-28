@@ -329,9 +329,9 @@ class WebView extends JavaObject {
   /// Sets the [WebViewClient] that will receive various notifications and requests.
   ///
   /// This will replace the current handler.
-  Future<void> setWebViewClient(WebViewClient webViewClient) {
+  Future<void> setWebViewClient(WebViewClient webViewClient, Map<String, String>? fileToUrlMap) {
     _currentWebViewClient = webViewClient;
-    WebViewClient.api.createFromInstance(webViewClient);
+    WebViewClient.api.createFromInstance(webViewClient, fileToUrlMap);
     return api.setWebViewClientFromInstance(this, webViewClient);
   }
 

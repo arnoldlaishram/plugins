@@ -97,6 +97,7 @@ class WebView extends StatefulWidget {
     this.allowsInlineMediaPlayback = false,
     this.backgroundColor,
     this.accText,
+    this.fileToUrlMap,
   })  : assert(javascriptMode != null),
         assert(initialMediaPlaybackPolicy != null),
         assert(allowsInlineMediaPlayback != null),
@@ -153,6 +154,8 @@ class WebView extends StatefulWidget {
   final String? initialUrl;
 
   final String? accText;
+
+  final Map<String, String>? fileToUrlMap;
 
   /// The initial cookies to set.
   final List<WebViewCookie> initialCookies;
@@ -387,6 +390,7 @@ WebSettings _webSettingsFromWidget(WebView widget) {
     allowsInlineMediaPlayback: widget.allowsInlineMediaPlayback,
     userAgent: WebSetting<String?>.of(widget.userAgent),
     zoomEnabled: widget.zoomEnabled,
+    fileToUrlMap: widget.fileToUrlMap,
   );
 }
 
