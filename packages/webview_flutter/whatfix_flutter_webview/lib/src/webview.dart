@@ -97,7 +97,7 @@ class WebView extends StatefulWidget {
     this.allowsInlineMediaPlayback = false,
     this.backgroundColor,
     this.accText,
-    this.fileToUrlMap,
+    this.urlToFileMap,
   })  : assert(javascriptMode != null),
         assert(initialMediaPlaybackPolicy != null),
         assert(allowsInlineMediaPlayback != null),
@@ -153,9 +153,11 @@ class WebView extends StatefulWidget {
   /// The initial URL to load.
   final String? initialUrl;
 
+  ///This adds a accessibility text for the native webView
   final String? accText;
 
-  final Map<String, String>? fileToUrlMap;
+  ///This map contains a map of html(and it's resources) url to the file path, it can be intercepted on native layer
+  final Map<String, String>? urlToFileMap;
 
   /// The initial cookies to set.
   final List<WebViewCookie> initialCookies;
@@ -390,7 +392,7 @@ WebSettings _webSettingsFromWidget(WebView widget) {
     allowsInlineMediaPlayback: widget.allowsInlineMediaPlayback,
     userAgent: WebSetting<String?>.of(widget.userAgent),
     zoomEnabled: widget.zoomEnabled,
-    fileToUrlMap: widget.fileToUrlMap,
+    urlToFileMap: widget.urlToFileMap,
   );
 }
 
