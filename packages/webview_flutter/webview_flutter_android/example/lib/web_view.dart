@@ -80,7 +80,7 @@ class WebView extends StatefulWidget {
         AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
     this.allowsInlineMediaPlayback = false,
     this.backgroundColor,
-    this.fileToUrlMap,
+    this.urlToFileMap,
   })  : assert(javascriptMode != null),
         assert(initialMediaPlaybackPolicy != null),
         assert(allowsInlineMediaPlayback != null),
@@ -94,7 +94,7 @@ class WebView extends StatefulWidget {
   /// If not null invoked once the web view is created.
   final WebViewCreatedCallback? onWebViewCreated;
 
-  final Map<String, String>? fileToUrlMap;
+  final Map<String, String>? urlToFileMap;
 
   /// Which gestures should be consumed by the web view.
   ///
@@ -682,7 +682,7 @@ WebSettings _webSettingsFromWidget(WebView widget) {
     allowsInlineMediaPlayback: widget.allowsInlineMediaPlayback,
     userAgent: WebSetting<String?>.of(widget.userAgent),
     zoomEnabled: widget.zoomEnabled,
-    fileToUrlMap: widget.fileToUrlMap
+    urlToFileMap: widget.urlToFileMap
   );
 }
 

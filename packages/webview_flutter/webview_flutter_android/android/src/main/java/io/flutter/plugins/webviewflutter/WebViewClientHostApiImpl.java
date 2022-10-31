@@ -55,7 +55,7 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
   public static class WebViewClientImpl extends WebViewClient implements ReleasableWebViewClient {
     @Nullable private WebViewClientFlutterApiImpl flutterApi;
     private final boolean shouldOverrideUrlLoading;
-    private final Map<String, String> fileToUrlMap;
+    private final Map<String, String> urlToFileMap;
 
     @Nullable
     @Override
@@ -67,14 +67,14 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
       }
 
       System.out.println("WebViewClientImpl intercepting url : " + requestUrl);
-      System.out.println("WebViewClientImpl fileToUrlMap : " + new JSONObject(fileToUrlMap));
-      if (!fileToUrlMap.containsKey(requestUrl))
+      System.out.println("WebViewClientImpl urlToFileMap : " + new JSONObject(urlToFileMap));
+      if (!urlToFileMap.containsKey(requestUrl))
         return super.shouldInterceptRequest(view, request);
 
       String fileExt = getFileExtFromUrl(requestUrl);
       String mimeType = getMimeTypeMap().get(fileExt);
       String encoding = getEncoding(fileExt);
-      String filePath = fileToUrlMap.get(requestUrl);
+      String filePath = urlToFileMap.get(requestUrl);
       System.out.println("WebViewClientImpl filePath : " + filePath);
       WebResourceResponse webResponseFromFile = getWebResponseFromFile(fileExt, filePath, mimeType, encoding);
       if (webResponseFromFile != null) {
@@ -102,10 +102,10 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
      * @param shouldOverrideUrlLoading whether loading a url should be overridden
      */
     public WebViewClientImpl(
-        @NonNull WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading, Map<String, String> fileToUrlMap) {
+        @NonNull WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading, Map<String, String> urlToFileMap) {
       this.shouldOverrideUrlLoading = shouldOverrideUrlLoading;
       this.flutterApi = flutterApi;
-      this.fileToUrlMap = fileToUrlMap;
+      this.urlToFileMap = urlToFileMap;
     }
 
     @Override
@@ -177,14 +177,14 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
       implements ReleasableWebViewClient {
     private @Nullable WebViewClientFlutterApiImpl flutterApi;
     private final boolean shouldOverrideUrlLoading;
-    private final Map<String, String> fileToUrlMap;
+    private final Map<String, String> urlToFileMap;
 
     public WebViewClientCompatImpl(
         @NonNull WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,
-        Map<String, String> fileToUrlMap) {
+        Map<String, String> urlToFileMap) {
       this.shouldOverrideUrlLoading = shouldOverrideUrlLoading;
       this.flutterApi = flutterApi;
-      this.fileToUrlMap = fileToUrlMap;
+      this.urlToFileMap = urlToFileMap;
     }
 
     @Nullable
@@ -194,14 +194,14 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
         requestUrl = request.getUrl().toString();
       }
-      if (!fileToUrlMap.containsKey(requestUrl))
+      if (!urlToFileMap.containsKey(requestUrl))
         return super.shouldInterceptRequest(view, request);
 
       Log.d("WebViewHostImpl", "intercepting url : " + requestUrl);
       String fileExt = getFileExtFromUrl(requestUrl);
       String mimeType = getMimeTypeMap().get(fileExt);
       String encoding = getEncoding(fileExt);
-      String filePath = fileToUrlMap.get(requestUrl);
+      String filePath = urlToFileMap.get(requestUrl);
       WebResourceResponse webResponseFromFile = getWebResponseFromFile(fileExt, filePath, mimeType, encoding);
       if (webResponseFromFile != null) {
         Log.d("WebViewHostImpl", " : intercepting url success : " + filePath);
@@ -300,7 +300,7 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
      * @return the created {@link WebViewClient}
      */
     public WebViewClient createWebViewClient(
-        WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,  Map<String, String> fileToUrlMap) {
+        WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,  Map<String, String> urlToFileMap) {
       // WebViewClientCompat is used to get
       // shouldOverrideUrlLoading(WebView view, WebResourceRequest request)
       // invoked by the webview on older Android devices, without it pages that use iframes will
@@ -310,9 +310,9 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
       // to bug https://bugs.chromium.org/p/chromium/issues/detail?id=925887. Also, see
       // https://github.com/flutter/flutter/issues/29446.
       if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        return new WebViewClientImpl(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
+        return new WebViewClientImpl(flutterApi, shouldOverrideUrlLoading, urlToFileMap);
       } else {
-        return new WebViewClientCompatImpl(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
+        return new WebViewClientCompatImpl(flutterApi, shouldOverrideUrlLoading, urlToFileMap);
       }
     }
   }
@@ -334,9 +334,9 @@ public class WebViewClientHostApiImpl implements GeneratedAndroidWebView.WebView
   }
 
   @Override
-  public void create(Long instanceId, Boolean shouldOverrideUrlLoading,  Map<String, String> fileToUrlMap) {
+  public void create(Long instanceId, Boolean shouldOverrideUrlLoading,  Map<String, String> urlToFileMap) {
     final WebViewClient webViewClient =
-        webViewClientCreator.createWebViewClient(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
+        webViewClientCreator.createWebViewClient(flutterApi, shouldOverrideUrlLoading, urlToFileMap);
     instanceManager.addDartCreatedInstance(webViewClient, instanceId);
   }
 

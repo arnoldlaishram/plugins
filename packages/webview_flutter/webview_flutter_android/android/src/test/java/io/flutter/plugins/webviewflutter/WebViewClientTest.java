@@ -50,10 +50,10 @@ public class WebViewClientTest {
         new WebViewClientCreator() {
           @Override
           public WebViewClient createWebViewClient(
-              WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,  Map<String, String> fileToUrlMap) {
+              WebViewClientFlutterApiImpl flutterApi, boolean shouldOverrideUrlLoading,  Map<String, String> urlToFileMap) {
             webViewClient =
                 (WebViewClientCompatImpl)
-                    super.createWebViewClient(flutterApi, shouldOverrideUrlLoading, fileToUrlMap);
+                    super.createWebViewClient(flutterApi, shouldOverrideUrlLoading, urlToFileMap);
             return webViewClient;
           }
         };
